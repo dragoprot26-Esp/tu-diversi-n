@@ -1,0 +1,5 @@
+{
+  "name": "Tu Diversión",
+  "description": "PWA para el alquiler de castillos inflables, metegoles, arcades y livings de eventos. Web pública con reservas y panel de gestión, sobre la base segura del ecosistema CyC (Supabase + Auth + RLS). Una tienda por licencia.",
+  "requestFramePermissions": []
+}
