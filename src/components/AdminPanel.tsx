@@ -546,7 +546,7 @@ export function AdminPanel({
   const handleSendRetiro = (booking: Booking) => {
     const cleanPhone = booking.customerPhone.replace(/[^0-9+]/g, '');
     const waText = `Hola *${booking.customerName}* de *${tenant.name}*. En breve estaremos retirando los productos alquilados.\n\n` +
-      `¡Esperamos que lo hayan disfrutado mucho! Nos encantaría que subas *La Mejor Foto* del evento a nuestra galería pública aquí para que otros la disfruten: ${window.location.origin}/?tenant=${tenant.id}#galeria 📸🎈`;
+      `¡Esperamos que lo hayan disfrutado mucho! Nos encantaría que subas *La Mejor Foto* del evento a nuestra galería pública aquí para que otros la disfruten: ${window.location.origin}/?codigo=${tenant.id}#galeria 📸🎈`;
 
     // Update booking status to 'completado'
     const updated = bookings.map(b => b.id === booking.id ? { ...b, status: 'completado' as BookingStatus } : b);
@@ -570,7 +570,7 @@ export function AdminPanel({
 
     const selectedProds = products.filter(p => recommendedProducts.includes(p.id));
     const listSummary = selectedProds.map(p => `- *${p.name}*: ${p.description} ($${p.price || 'S/P'})`).join('\n');
-    const waText = `Hola, te recomiendo estos productos de *${tenant.name}* que están disponibles y libres para alquiler inmediato:\n\n${listSummary}\n\nPodés verlos y reservarlos acá: ${window.location.origin}/?tenant=${tenant.id}`;
+    const waText = `Hola, te recomiendo estos productos de *${tenant.name}* que están disponibles y libres para alquiler inmediato:\n\n${listSummary}\n\nPodés verlos y reservarlos acá: ${window.location.origin}/?codigo=${tenant.id}`;
 
     const cleanPhone = recommendTargetPhone.startsWith('+') 
       ? recommendTargetPhone.replace(/[^0-9+]/g, '')
@@ -881,7 +881,7 @@ export function AdminPanel({
               </button>
             ) : (
               <a 
-                href={`/?tenant=${tenant.id}`} 
+                href={`/?codigo=${tenant.id}`} 
                 target="_blank" 
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm"

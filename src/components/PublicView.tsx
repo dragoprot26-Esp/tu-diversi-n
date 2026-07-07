@@ -1007,37 +1007,15 @@ export default function PublicView({
             <h3 className="text-lg font-extrabold text-slate-800">Compartir {tenant.name}</h3>
             <p className="text-xs text-slate-400 mt-1">Escanea para ingresar directo a los productos públicos</p>
 
-            {/* Custom Visual QR Simulation */}
+            {/* QR real (escaneable) que codifica el enlace público ?codigo= */}
             <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 my-4 inline-block">
-              <div className="w-48 h-48 bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex flex-col items-center justify-center relative">
-                
-                {/* Simulated QR Code Blocks */}
-                <div className="grid grid-cols-4 gap-1 w-full h-full opacity-90">
-                  <div className="bg-slate-900 rounded-sm" />
-                  <div className="bg-slate-900 rounded-sm" />
-                  <div className="bg-transparent" />
-                  <div className="bg-slate-900 rounded-sm" />
-                  
-                  <div className="bg-slate-900 rounded-sm" />
-                  <div className="bg-transparent" />
-                  <div className="bg-slate-900 rounded-sm" />
-                  <div className="bg-slate-900 rounded-sm" />
-                  
-                  <div className="bg-transparent" />
-                  <div className="bg-slate-900 rounded-sm" />
-                  <div className="bg-slate-900 rounded-sm" />
-                  <div className="bg-transparent" />
-                  
-                  <div className="bg-slate-900 rounded-sm" />
-                  <div className="bg-slate-900 rounded-sm" />
-                  <div className="bg-transparent" />
-                  <div className="bg-slate-900 rounded-sm" />
-                </div>
-
-                {/* Simulated Center Logo */}
-                <div className="absolute inset-0 m-auto w-10 h-10 bg-white rounded-full border border-slate-200 flex items-center justify-center p-0.5 shadow">
-                  <img src={tenant.logoUrl || DEFAULT_CASTLE_IMAGE} alt="QR Logo" className="w-full h-full object-cover rounded-full" />
-                </div>
+              <div className="w-48 h-48 bg-white border border-slate-200 rounded-xl p-2 shadow-sm">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=${encodeURIComponent(`${window.location.origin}${window.location.pathname}?codigo=${tenant.id}`)}`}
+                  alt={`Código QR de ${tenant.name}`}
+                  className="w-full h-full object-contain"
+                  referrerPolicy="no-referrer"
+                />
               </div>
             </div>
 
