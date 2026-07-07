@@ -26,6 +26,7 @@ export interface Tenant {
   };
   categories: string[]; // custom categories in addition to default
   collaborators: Collaborator[];
+  extenderHabilitado?: boolean; // muestra el botón "Extender" en los alquileres (opción del inquilino)
 }
 
 export interface CustomText {
@@ -90,6 +91,7 @@ export interface Booking {
   rentalDate: string; // YYYY-MM-DD
   returnDate: string; // YYYY-MM-DD HH:MM
   notes?: string;
+  duracion?: string; // duración elegida por el cliente (ej: "Día completo", "4 horas")
 }
 
 export interface GalleryPhoto {
