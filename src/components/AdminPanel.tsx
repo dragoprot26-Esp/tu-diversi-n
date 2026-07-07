@@ -230,6 +230,25 @@ export function AdminPanel({
   // Enforce Collaborator Restrictions
   const isColab = currentSession.role === 'colaborador';
 
+  // Subir imagen desde PC/Móvil → la comprime y devuelve un data URI (base64)
+  const subirImagen = (file: File, maxW: number, cb: (dataUrl: string) => void) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.drawImage(img, 0, 0, w, h);
+        cb(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Totalized Metrics
   const metrics = useMemo(() => {
     const filteredBookings = bookings.filter(b => {
@@ -1475,15 +1494,25 @@ export function AdminPanel({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase">URL de Imagen (Carga desde movil/pc o internet)</label>
-                    <input 
-                      type="url" 
-                      placeholder="https://ejemplo.com/imagen.jpg"
-                      value={productForm.imageUrl}
-                      onChange={(e) => setProductForm({ ...productForm, imageUrl: e.target.value })}
-                      className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-xl focus:outline-none"
-                    />
-                    <span className="text-[9px] text-slate-400 block mt-1">Pegue un enlace o use el castillo por defecto.</span>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase">Imagen del producto</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <input
+                        type="text"
+                        placeholder="Pegá una URL o subí una foto →"
+                        value={productForm.imageUrl}
+                        onChange={(e) => setProductForm({ ...productForm, imageUrl: e.target.value })}
+                        className="flex-1 px-3 py-2 border border-slate-200 rounded-xl focus:outline-none"
+                      />
+                      <label className="shrink-0 flex items-center gap-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl cursor-pointer whitespace-nowrap">
+                        <Camera className="w-4 h-4" /> Subir PC/Móvil
+                        <input type="file" accept="image/*" className="hidden"
+                          onChange={(e) => { const f = e.target.files?.[0]; if (f) subirImagen(f, 1000, (d) => setProductForm({ ...productForm, imageUrl: d })); }} />
+                      </label>
+                    </div>
+                    {productForm.imageUrl && (
+                      <img src={productForm.imageUrl} alt="" className="mt-2 w-20 h-20 object-cover rounded-lg border border-slate-200" />
+                    )}
+                    <span className="text-[9px] text-slate-400 block mt-1">Pegá un enlace o subí una foto desde tu PC o celular.</span>
                   </div>
 
                   <div>
@@ -2012,17 +2041,24 @@ export function AdminPanel({
                       </div>
                     ) : (
                       <div className="sm:col-span-2">
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase">URL de Imagen del Fondo</label>
-                        <input 
-                          type="url"
-                          placeholder="Ej: https://images.unsplash.com/photo-..."
-                          value={tenant.publicTheme.bgImageUrl || ''}
-                          onChange={(e) => onUpdateTenant({
-                            ...tenant,
-                            publicTheme: { ...tenant.publicTheme, bgImageUrl: e.target.value }
-                          })}
-                          className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none"
-                        />
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase">Imagen del Fondo</label>
+                        <div className="flex items-center gap-2 mt-1">
+                          <input
+                            type="text"
+                            placeholder="Pegá una URL o subí una foto →"
+                            value={tenant.publicTheme.bgImageUrl || ''}
+                            onChange={(e) => onUpdateTenant({
+                              ...tenant,
+                              publicTheme: { ...tenant.publicTheme, bgImageUrl: e.target.value }
+                            })}
+                            className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none"
+                          />
+                          <label className="shrink-0 flex items-center gap-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl cursor-pointer whitespace-nowrap">
+                            <Camera className="w-4 h-4" /> Subir PC/Móvil
+                            <input type="file" accept="image/*" className="hidden"
+                              onChange={(e) => { const f = e.target.files?.[0]; if (f) subirImagen(f, 1400, (d) => onUpdateTenant({ ...tenant, publicTheme: { ...tenant.publicTheme, bgImageUrl: d } })); }} />
+                          </label>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -2039,17 +2075,21 @@ export function AdminPanel({
                       referrerPolicy="no-referrer"
                     />
                     <div className="flex-1">
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase">Cambiar Enlace de Logo</label>
-                      <input 
-                        type="url"
-                        placeholder="Pegar URL de logo de imagen (desde celular/pc o red)"
-                        value={tenant.logoUrl}
-                        onChange={(e) => onUpdateTenant({
-                          ...tenant,
-                          logoUrl: e.target.value
-                        })}
-                        className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none"
-                      />
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase">Logo del comercio</label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <input
+                          type="text"
+                          placeholder="Pegá una URL o subí una foto →"
+                          value={tenant.logoUrl}
+                          onChange={(e) => onUpdateTenant({ ...tenant, logoUrl: e.target.value })}
+                          className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none"
+                        />
+                        <label className="shrink-0 flex items-center gap-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl cursor-pointer whitespace-nowrap">
+                          <Camera className="w-4 h-4" /> Subir PC/Móvil
+                          <input type="file" accept="image/*" className="hidden"
+                            onChange={(e) => { const f = e.target.files?.[0]; if (f) subirImagen(f, 400, (d) => onUpdateTenant({ ...tenant, logoUrl: d })); }} />
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
