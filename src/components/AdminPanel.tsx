@@ -555,6 +555,21 @@ export function AdminPanel({
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(waText)}`, '_blank');
   };
 
+  // EXTENDER: suma tiempo a la devolución del alquiler (si el inquilino lo habilitó)
+  const handleExtender = (booking: Booking) => {
+    const extra = window.prompt('¿Cuánto querés extender el alquiler? (ej: 2 horas, 1 día, hasta las 22:00)');
+    if (!extra || !extra.trim()) return;
+    const nuevaDev = `${booking.returnDate}  +${extra.trim()}`;
+    const updated = bookings.map(b => b.id === booking.id
+      ? { ...b, returnDate: nuevaDev, notes: `${b.notes || ''} · Extendido: ${extra.trim()}`.trim() }
+      : b);
+    onUpdateBookings(updated);
+    // Aviso opcional al cliente por WhatsApp
+    const cleanPhone = booking.customerPhone.replace(/[^0-9+]/g, '');
+    const waText = `¡Hola *${booking.customerName}*! Confirmamos la *extensión* de tu alquiler en *${tenant.name}*: +${extra.trim()}. ¡A seguir disfrutando! 🎉`;
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(waText)}`, '_blank');
+  };
+
   // Recommendation Checklist
   const toggleRecommendedProduct = (id: string) => {
     setRecommendedProducts(prev => 
@@ -1113,7 +1128,12 @@ export function AdminPanel({
                               ))}
                             </ul>
                           </td>
-                          <td className="py-4 px-2 font-mono text-slate-500">{booking.returnDate}</td>
+                          <td className="py-4 px-2 font-mono text-slate-500">
+                            {booking.returnDate}
+                            {booking.duracion && (
+                              <span className="block text-[9px] font-bold text-violet-600 mt-0.5">⏱ {booking.duracion}</span>
+                            )}
+                          </td>
                           <td className="py-4 px-2 font-black text-slate-900">${booking.totalAmount.toLocaleString('es-AR')}</td>
                           <td className="py-4 px-2 text-center">
                             <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase font-black tracking-wider ${
@@ -1138,6 +1158,17 @@ export function AdminPanel({
                                   id={`en-camino-btn-${booking.id}`}
                                 >
                                   🚚 En Camino
+                                </button>
+                              )}
+
+                              {/* Extender Action (solo si el inquilino lo habilitó) */}
+                              {tenant.extenderHabilitado && booking.status !== 'completado' && (
+                                <button
+                                  onClick={() => handleExtender(booking)}
+                                  className="px-2.5 py-1.5 bg-violet-50 text-violet-700 border border-violet-100 rounded-lg font-bold hover:bg-violet-100 flex items-center gap-1 transition-colors"
+                                  id={`extender-btn-${booking.id}`}
+                                >
+                                  ⏱ Extender
                                 </button>
                               )}
 
@@ -2275,6 +2306,21 @@ export function AdminPanel({
                   />
                   <span className="text-[10px] text-slate-400 mt-1 block">Esta licencia vincula sus datos en la red segura de Tu Diversión.</span>
                 </div>
+
+                {/* Toggle: habilitar extensión de alquileres (a gusto del inquilino) */}
+                <label className="flex items-start gap-3 p-3 bg-violet-50 border border-violet-100 rounded-xl cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!tenant.extenderHabilitado}
+                    onChange={(e) => onUpdateTenant({ ...tenant, extenderHabilitado: e.target.checked })}
+                    className="mt-0.5 w-4 h-4 accent-violet-600"
+                  />
+                  <span className="text-[11px] text-slate-600 leading-relaxed">
+                    ⏱ <strong className="text-slate-800">Habilitar extensión de alquileres</strong> — muestra un botón
+                    "Extender" en cada alquiler, para sumarle tiempo a la devolución cuando el cliente quiere quedarse
+                    más. Si no lo usás, dejalo apagado.
+                  </span>
+                </label>
 
                 <button
                   type="submit"

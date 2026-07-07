@@ -280,6 +280,7 @@ export default function PublicView({
   const [checkoutName, setCheckoutName] = useState('');
   const [checkoutPhone, setCheckoutPhone] = useState('');
   const [checkoutMethod, setCheckoutMethod] = useState<'whatsapp' | 'email'>('whatsapp');
+  const [checkoutDuracion, setCheckoutDuracion] = useState('Día completo');
   const [bookingSuccessCode, setBookingSuccessCode] = useState<string | null>(null);
 
   // Gallery Upload form
@@ -398,7 +399,8 @@ export default function PublicView({
       status: 'pendiente',
       rentalDate: new Date().toISOString().split('T')[0],
       returnDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + ' 18:00',
-      notes: 'Reserva realizada desde la página pública'
+      duracion: checkoutDuracion,
+      notes: `Reserva desde la web · Duración: ${checkoutDuracion}`
     };
 
     // Save Booking in Parent State
@@ -411,6 +413,7 @@ export default function PublicView({
       `*Cliente:* ${checkoutName}\n` +
       `*Teléfono:* ${checkoutPhone}\n\n` +
       `*Pedido:*\n${itemsSummary}\n\n` +
+      `*Duración:* ${checkoutDuracion}\n` +
       `*Total Estimado:* $${cartTotalAmount}\n\n` +
       `Por favor contáctenme para coordinar la entrega. Gracias.`;
 
@@ -945,6 +948,21 @@ export default function PublicView({
                         className="w-full pl-16 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 font-medium font-mono"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Duración del alquiler</label>
+                    <select
+                      value={checkoutDuracion}
+                      onChange={(e) => setCheckoutDuracion(e.target.value)}
+                      className="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-slate-400 font-medium"
+                    >
+                      <option value="Por hora">Por hora</option>
+                      <option value="4 horas">4 horas</option>
+                      <option value="8 horas">8 horas</option>
+                      <option value="Día completo">Día completo</option>
+                      <option value="Fin de semana">Fin de semana</option>
+                    </select>
                   </div>
 
                   <div>
