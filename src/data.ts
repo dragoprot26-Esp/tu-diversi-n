@@ -5,7 +5,9 @@
 
 import { Tenant, Product, Customer, Booking, GalleryPhoto } from './types';
 
-export const DEFAULT_CASTLE_IMAGE = '/src/assets/images/castillo_inflable_1783288093601.jpg';
+// Placeholder que SIEMPRE renderiza (la ruta /src/assets/... daba 404 en producción).
+// El dueño reemplaza las imágenes reales desde el panel.
+export const DEFAULT_CASTLE_IMAGE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="%2310b981"/><text x="300" y="210" font-size="140" text-anchor="middle">🎈</text></svg>';
 
 export const INITIAL_PRODUCTS: Product[] = [
   {
