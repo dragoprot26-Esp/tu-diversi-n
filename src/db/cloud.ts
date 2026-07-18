@@ -205,3 +205,8 @@ export async function divePublica(codigo: string): Promise<CloudData | null> {
 export async function diveAgregarReserva(codigo: string, reserva: any): Promise<void> {
   try { await rpc('dive_agregar_reserva', { p_codigo: codigo, p_reserva: reserva }, false); } catch (e) { /* noop */ }
 }
+
+export async function diveVersion(codigo: string): Promise<string> {
+  try { const r = await rpc('dive_version', { p_codigo: codigo }, false); return typeof r === 'string' ? r : String(r || ''); }
+  catch (e) { return ''; }
+}
