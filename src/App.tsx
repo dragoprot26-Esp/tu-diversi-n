@@ -10,7 +10,7 @@ import PublicView from './components/PublicView';
 import { AdminPanel } from './components/AdminPanel';
 import {
   estaLogueado, miMembresia, cloudLoad, cloudSave,
-  divePublica, diveAgregarReserva, signOutGlobal,
+  divePublica, diveAgregarReserva, diveVersion, signOutGlobal,
 } from './db/cloud';
 
 // ── Plantillas (una tienda por licencia) ────────────────────────────────
@@ -131,7 +131,11 @@ export default function App() {
   // ── Sondeo de reservas nuevas (cada 10s) ───────────────────────────────
   useEffect(() => {
     if (!session.isLoggedIn || !licenseCode) return;
+    let lastVer = '';
     const iv = setInterval(async () => {
+      const ver = await diveVersion(licenseCode);
+      if (!ver || ver === lastVer) return; // nada cambió → no baja imágenes
+      lastVer = ver;
       const blob = await cloudLoad(licenseCode);
       if (!blob || !blob.bookings) return;
       const cloudB = blob.bookings as Booking[];
@@ -141,7 +145,7 @@ export default function App() {
         const merged = [...cloudB, ...localOnly];
         return JSON.stringify(prev) === JSON.stringify(merged) ? prev : merged;
       });
-    }, 10000);
+    }, 30000);
     return () => clearInterval(iv);
   }, [session.isLoggedIn, licenseCode]);
 
